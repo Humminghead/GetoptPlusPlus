@@ -41,30 +41,22 @@ bool ConsoleOptionsHandler::ProcessCmdLine(size_t toBeProcCnt) noexcept {
     }
   }
 
-  return processedArgs;
+  return processedArgs == toBeProcCnt;
 }
 
 bool ConsoleOptionsHandler::AddKey(const Option &key,
                                    HandlerT &&value) noexcept {
-  Option tOpt;
 
-  tOpt.flag = key.flag;
-  tOpt.has_arg = key.has_arg;
-  tOpt.name = nullptr;
-
-  auto res0 = m_Impl->keys_.emplace(tOpt, value);
-
-  tOpt.flag = nullptr;
-  tOpt.has_arg = key.has_arg;
-  tOpt.name = key.name;
-
-  auto res1 = m_Impl->keys_.emplace(tOpt, value);
-
-  return res0.second && res1.second;
+  return m_Impl->keys_
+             .try_emplace(Option{nullptr, key.flag, key.has_arg}, value)
+             .second &&
+         m_Impl->keys_
+             .try_emplace(Option{key.name, nullptr, key.has_arg}, value)
+             .second;
 }
 
 size_t ConsoleOptionsHandler::HandlersCount() noexcept {
-  return m_Impl->keys_.size();
+    return (m_Impl->keys_.size() > 0) ? (m_Impl->keys_.size() / 2) : 0;
 }
 
 bool ConsoleOptionsHandler::ProcessArgument(size_t &pos, Option &opt) noexcept {
@@ -78,8 +70,13 @@ bool ConsoleOptionsHandler::ProcessArgument(size_t &pos, Option &opt) noexcept {
     pos += optName.length();
     pos++;
   } else {
-    opt.flag = std::string_view(&m_Impl->line_[++pos]).data();
-    pos += 2;
+    if (auto flag = std::string_view(&m_Impl->line_[pos]);
+        flag.front() != '-') {
+      return false;
+    } else {
+      opt.flag = flag.substr(1, flag.size()).data();
+      pos += 3;
+    }
   }
 
   if (auto it = m_Impl->keys_.find(opt); std::end(m_Impl->keys_) != it) {
@@ -103,7 +100,7 @@ bool ConsoleOptionsHandler::ProcessArgument(size_t &pos, Option &opt) noexcept {
 }
 
 void ConsoleOptionsHandler::FillLine(int argc, char **argv) noexcept {
-  for (int n = 0; n < argc; n++) {
+  for (int n = 1; n < argc; n++) {//Skip execution path
     m_Impl->line_.append(argv[n]).append(" ");
     m_Impl->line_.back() = 0x00;
   }
