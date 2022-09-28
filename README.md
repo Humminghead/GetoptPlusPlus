@@ -8,7 +8,6 @@ This is the C++ equivalent of the old good C getopt library. This library parses
 #include <iostream>
 #include <GetOptPP/ConsoleKeyOption.h>
 #include <GetOptPP/ConsoleOptionsHandler.h>
-#include <netinet/ip6.h>
 
 //Run arguments: -t --param 741
 
