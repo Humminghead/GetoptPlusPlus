@@ -83,6 +83,7 @@ bool ConsoleOptionsHandler::ProcessArgument(size_t &pos, Option &opt) noexcept {
     if (auto handler = it->second; it->first.has_arg) {
       if (handler) {
         std::string_view value(&m_Impl->line_[pos]);
+        if(value.empty()) return false;
         handler(value.data());
         pos += value.length();
         pos++;
