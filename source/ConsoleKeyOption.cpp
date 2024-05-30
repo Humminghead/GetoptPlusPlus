@@ -1,5 +1,6 @@
 #include "ConsoleKeyOption.h"
 #include <string_view>
+#include <string>
 
 namespace GetOptPlusPlus {
 void Option::reset() {
