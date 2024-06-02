@@ -47,12 +47,17 @@ bool ConsoleOptionsHandler::ProcessCmdLine(size_t toBeProcCnt) noexcept {
 bool ConsoleOptionsHandler::AddKey(const Option &key,
                                    HandlerT &&value) noexcept {
 
-  return m_Impl->keys_
-             .try_emplace(Option{nullptr, key.flag, key.has_arg}, value)
-             .second &&
-         m_Impl->keys_
-             .try_emplace(Option{key.name, nullptr, key.has_arg}, value)
-             .second;
+  bool nAdd{false}, kAdd{false};
+  if (key.flag) {
+    kAdd = m_Impl->keys_.try_emplace(Option{nullptr, key.flag, key.has_arg}, value)
+        .second;
+  }
+  if (key.name) {
+    nAdd = m_Impl->keys_.try_emplace(Option{key.name, nullptr, key.has_arg}, value)
+        .second;
+  }
+
+  return kAdd || nAdd;
 }
 
 size_t ConsoleOptionsHandler::HandlersCount() noexcept {
