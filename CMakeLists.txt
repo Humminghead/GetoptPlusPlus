@@ -7,7 +7,7 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB H_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
+file(GLOB H_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/*.h)
 file(GLOB CXX_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${CXX_FILES})
@@ -33,8 +33,8 @@ configure_package_config_file( "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Confi
                                )
 
 write_basic_package_version_file("${PROJECT_NAME}ConfigVersion.cmake"
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY SameMajorVersion)
+                                 VERSION ${PROJECT_VERSION}
+                                 COMPATIBILITY SameMajorVersion)
 
 target_include_directories(
   ${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${INCLUDE_BUILD_DIR}>
