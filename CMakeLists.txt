@@ -16,8 +16,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Define install path
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME} )
-set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${PROJECT_NAME} )
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
+set(INCLUDE_BUILD_DIR "${PROJECT_SOURCE_DIR}/include/")
+set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${PROJECT_NAME})
 
 # Print install path
 message(VERBOSE "Install includes in: " ${INCLUDE_INSTALL_DIR})
@@ -32,8 +33,12 @@ configure_package_config_file( "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Confi
                                )
 
 write_basic_package_version_file("${PROJECT_NAME}ConfigVersion.cmake"
-                                 VERSION ${PROJECT_VERSION}
-                                 COMPATIBILITY SameMajorVersion)
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+target_include_directories(
+  ${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${INCLUDE_BUILD_DIR}>
+                            $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>)
 
 # Install configuration files
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
