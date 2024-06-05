@@ -1,5 +1,5 @@
-#include "ConsoleKeyOption.h"
-#include <ConsoleOptionsHandler.h>
+#include "GetOptPP/ConsoleKeyOption.h"
+#include "GetOptPP/ConsoleOptionsHandler.h"
 
 namespace GetOptPlusPlus {
 
