@@ -1,5 +1,7 @@
 #include "GetOptPP/ConsoleKeyOption.h"
 #include "GetOptPP/ConsoleOptionsHandler.h"
+#include <string>
+#include <unordered_map>
 
 namespace GetOptPlusPlus {
 
@@ -27,11 +29,7 @@ ConsoleOptionsHandler::ConsoleOptionsHandler(int argc, char **argv,
   FillLine(argc, argv);
 }
 
-void ConsoleOptionsHandler::ProcessCmdLine() noexcept {
-  this->ProcessCmdLine(0);
-}
-
-bool ConsoleOptionsHandler::ProcessCmdLine(size_t toBeProcCnt) noexcept {
+size_t ConsoleOptionsHandler::ProcessCmdLine() noexcept {
   size_t processedArgs{0};
 
   if (auto pos = m_Impl->line_.find_first_of("-"); std::string::npos != pos) {
@@ -41,23 +39,22 @@ bool ConsoleOptionsHandler::ProcessCmdLine(size_t toBeProcCnt) noexcept {
     }
   }
 
-  return processedArgs == toBeProcCnt;
+  return processedArgs;
 }
 
-bool ConsoleOptionsHandler::AddKey(const Option &key,
-                                   HandlerT &&value) noexcept {
+bool ConsoleOptionsHandler::AddKey(const Option &key, HandlerT &&value) noexcept {
+    if (auto it = m_Impl->keys_.find(key); it != std::end(m_Impl->keys_))
+        return false;
 
-  bool nAdd{false}, kAdd{false};
-  if (key.flag) {
-    kAdd = m_Impl->keys_.try_emplace(Option{nullptr, key.flag, key.has_arg}, value)
-        .second;
-  }
-  if (key.name) {
-    nAdd = m_Impl->keys_.try_emplace(Option{key.name, nullptr, key.has_arg}, value)
-        .second;
-  }
+    bool nAdd{false}, kAdd{false};
+    if (key.flag) {
+        kAdd = m_Impl->keys_.try_emplace(Option{nullptr, key.flag, key.has_arg}, value).second;
+    }
+    if (key.name) {
+        nAdd = m_Impl->keys_.try_emplace(Option{key.name, nullptr, key.has_arg}, value).second;
+    }
 
-  return kAdd || nAdd;
+    return kAdd || nAdd;
 }
 
 size_t ConsoleOptionsHandler::HandlersCount() noexcept {
@@ -75,13 +72,12 @@ bool ConsoleOptionsHandler::ProcessArgument(size_t &pos, Option &opt) noexcept {
     pos += optName.length();
     pos++;
   } else {
-    if (auto flag = std::string_view(&m_Impl->line_[pos]);
-        flag.front() != '-') {
-      return false;
-    } else {
-      opt.flag = flag.substr(1, flag.size()).data();
-      pos += 3;
-    }
+      if (auto flag = std::string_view(&m_Impl->line_[pos]); flag.front() != '-' || flag.size() > 2) {
+          return false;
+      } else {
+          opt.flag = flag.substr(1, flag.size()).data();
+          pos += 3;
+      }
   }
 
   if (auto it = m_Impl->keys_.find(opt); std::end(m_Impl->keys_) != it) {
