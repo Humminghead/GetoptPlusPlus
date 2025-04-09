@@ -2,8 +2,6 @@
 
 #include <functional>
 #include <memory>
-#include <string>
-#include <unordered_map>
 
 namespace GetOptPlusPlus {
 
@@ -19,8 +17,7 @@ public:
   ConsoleOptionsHandler(int argc, char **argv, const HandlerKeyStoreT &store);
   ConsoleOptionsHandler(int argc, char **argv, HandlerKeyStoreT &&store);
 
-  void ProcessCmdLine() noexcept;
-  bool ProcessCmdLine(size_t toBeProcCnt) noexcept;
+  size_t ProcessCmdLine() noexcept;
   bool AddKey(const Option &key, HandlerT &&value) noexcept;
   size_t HandlersCount() noexcept;
 
